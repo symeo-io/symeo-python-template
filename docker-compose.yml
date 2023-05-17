@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+  database:
+    platform: linux/amd64
+    image: "postgres:13"
+    container_name: "symeo-python-template-database"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=P@ssw0rd
+      - POSTGRES_DB=symeo-python-template
+    ports:
+      - "5432:5432"
