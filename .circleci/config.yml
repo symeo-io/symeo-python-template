@@ -12,13 +12,11 @@ jobs:
       - run:
           name: Run tests with coverage
           command: |
-            poetry shell
-            coverage run -m pytest tests
+            poetry run coverage run -m pytest tests
       - run:
           name: Display coverage
           command: |
-            poetry shell
-            coverage report
+            poetry run coverage report
 
 workflows:
   install_and_test:
