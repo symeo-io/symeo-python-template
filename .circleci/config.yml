@@ -1,27 +1,14 @@
 version: 2.1
 orbs:
-  python: circleci/python@2.0.3
+  python: circleci/python@2.1.1
 jobs:
   install_and_test:
     executor: python/default
     working_directory: ~/symeo-python-template
     steps:
       - checkout
-      - run:
-          name: Install Poetry
-          command: |
-            curl -sSL https://install.python-poetry.org | python3 -
-      - restore_cache:
-            key: dependency-cache-{{ checksum "~/symeo-python-template/poetry.lock" }}
-      - run:
-          name: Install dependencies
-          command: |
-            poetry shell
-            poetry install
-      - save_cache:
-            key: dependency-cache-{{ checksum "~/symeo-python-template/poetry.lock" }}
-            paths:
-              - ".venv"
+      - python/install-packages:
+          pkg-manager: poetry
       - run:
           name: Run tests with coverage
           command: |
