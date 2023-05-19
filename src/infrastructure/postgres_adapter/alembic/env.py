@@ -1,5 +1,6 @@
 import urllib.parse
 from logging.config import fileConfig
+from typing import Any
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -66,17 +67,19 @@ def run_migrations_online() -> None:
 
     """
     alembic_config = config.get_section(config.config_ini_section)
-    alembic_config["sqlalchemy.url"] = get_url()
-    connectable = engine_from_config(
-        alembic_config,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
-    with connectable.connect() as connection:
-        context.configure(connection=connection, compare_type=True)
+    if alembic_config is not None:
+        alembic_config_dict: dict[str, Any] = dict(alembic_config)
+        alembic_config_dict["sqlalchemy.url"] = get_url()
+        connectable = engine_from_config(
+            alembic_config_dict,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+        with connectable.connect() as connection:
+            context.configure(connection=connection, compare_type=True)
 
-        with context.begin_transaction():
-            context.run_migrations()
+            with context.begin_transaction():
+                context.run_migrations()
 
 
 if context.is_offline_mode():

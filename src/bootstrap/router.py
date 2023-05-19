@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.application.rest_api_adapter.controllers.user_controller import UserController
+from src.application.rest_api_adapter.controller.user_controller import UserController
 from src.domain.service.user_service import UserService
 from src.infrastructure.postgres_adapter.adapter.postgres_user_adapter import (
     PostgresUserAdapter,

@@ -15,7 +15,7 @@ def bootstrap() -> FastAPI:
 # Run with Poetry
 def main():
     app = bootstrap()
-    uvicorn.run(app=app)
+    uvicorn.run(app=app, port=9999)
 
 
 # Run with IDE
