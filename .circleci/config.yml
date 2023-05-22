@@ -5,7 +5,6 @@ orbs:
 
 jobs:
   install_and_test:
-    executor: python/default
     working_directory: ~/symeo-python-template
     machine:
       image: ubuntu-2204:2023.04.2
