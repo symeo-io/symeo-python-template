@@ -7,6 +7,7 @@ jobs:
   install_and_test:
     executor: python/default
     working_directory: ~/symeo-python-template
+    machine: true
     steps:
       - checkout
       - python/install-packages:
@@ -26,4 +27,6 @@ jobs:
 workflows:
   install_and_test:
     jobs:
-      - install_and_test
+      - install_and_test:
+        context:
+          - slack-notifications
