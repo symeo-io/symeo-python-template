@@ -28,5 +28,5 @@ workflows:
   install_and_test:
     jobs:
       - install_and_test:
-        context:
-          - slack-notifications
+          context:
+            - slack-notifications
