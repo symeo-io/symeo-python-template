@@ -1,6 +1,8 @@
 version: 2.1
 orbs:
   python: circleci/python@2.1.1
+  slack: circleci/slack@4.10.1
+
 jobs:
   install_and_test:
     executor: python/default
