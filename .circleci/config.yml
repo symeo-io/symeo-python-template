@@ -17,6 +17,9 @@ jobs:
           name: Display coverage
           command: |
             poetry run coverage report
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
 
 workflows:
   install_and_test:

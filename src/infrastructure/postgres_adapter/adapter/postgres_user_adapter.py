@@ -4,7 +4,6 @@ from typing import Generator, Optional
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.bootstrap.configuration import configuration
 from src.domain.model.user_model import User
 from src.domain.port.port_out.user_storage_port import UserStoragePort
 from src.infrastructure.postgres_adapter.entity.user_entity import UserEntity
@@ -12,9 +11,14 @@ from src.infrastructure.postgres_adapter.mapper.user_mapper import UserMapper
 
 
 class PostgresUserAdapter(UserStoragePort):
+    __database_url: str
+
+    def __init__(self, configuration_service: str):
+        self.__database_url = configuration_service
+
     @contextmanager
     def __get_connection_session(self) -> Generator:
-        engine = create_engine(configuration.DATABASE_URL)
+        engine = create_engine(self.__database_url, pool_pre_ping=True)
         connection: sessionmaker[Session] = sessionmaker(
             autocommit=False, autoflush=False, bind=engine
         )
