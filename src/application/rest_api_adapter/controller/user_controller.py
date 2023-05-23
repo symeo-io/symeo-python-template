@@ -1,7 +1,4 @@
-from typing import Optional
-
 from fastapi import APIRouter
-from pydantic.error_wrappers import ValidationError
 
 from src.application.rest_api_adapter.dto.user.get_user_dto import GetUserDTO
 from src.application.rest_api_adapter.dto.user.post_user_dto import PostUserDTO
@@ -19,33 +16,24 @@ class UserController:
         @router.get("/{user_id}", status_code=200)
         def get_user(
             user_id: str,
-        ) -> Optional[GetUserDTO]:
+        ) -> GetUserDTO:
             """
             Get a specific user by id
             """
-            try:
-                user = self.__user_facade.get_user(user_id)
-                if user:
-                    return UserMapper.from_domain_to_response(user)
-                return None
-            except ValidationError as e:
-                print(e.json())
+            return UserMapper.from_domain_to_response(
+                self.__user_facade.get_user(user_id)
+            )
 
         @router.post("/", status_code=200)
         def post_user(
             user_dto: PostUserDTO,
-        ) -> Optional[GetUserDTO]:
+        ) -> GetUserDTO:
             """
             Create a user
             """
-            try:
-                user = self.__user_facade.create_user(
-                    UserMapper.from_request_to_domain(user_dto)
-                )
-                if user:
-                    return UserMapper.from_domain_to_response(user)
-                return None
-            except ValidationError as e:
-                print(e.json())
+            user = self.__user_facade.create_user(
+                UserMapper.from_request_to_domain(user_dto)
+            )
+            return UserMapper.from_domain_to_response(user)
 
         return router

@@ -13,8 +13,8 @@ from src.infrastructure.postgres_adapter.mapper.user_mapper import UserMapper
 class PostgresUserAdapter(UserStoragePort):
     __database_url: str
 
-    def __init__(self, configuration_service: str):
-        self.__database_url = configuration_service
+    def __init__(self, database_url: str):
+        self.__database_url = database_url
 
     @contextmanager
     def __get_connection_session(self) -> Generator:
