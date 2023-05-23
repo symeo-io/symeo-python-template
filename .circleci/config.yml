@@ -5,7 +5,7 @@ orbs:
 jobs:
   install_and_test:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2204:2023.04.2
       docker_layer_caching: true
     working_directory: ~/symeo-python-template
     steps:
@@ -21,7 +21,6 @@ jobs:
       - run:
           name: Install project dependencies
           command: |
-            poetry shell
             poetry install
       - run:
           name: Run tests with coverage
