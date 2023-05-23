@@ -2,16 +2,26 @@ version: 2.1
 orbs:
   python: circleci/python@2.1.1
   slack: circleci/slack@4.10.1
-
 jobs:
   install_and_test:
-    working_directory: ~/symeo-python-template
     machine:
       image: ubuntu-2204:2023.04.2
+      docker_layer_caching: true
+    working_directory: ~/symeo-python-template
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: poetry
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt update
+            sudo apt install libpq-dev
+            python3 -m pip install -U pip pipx
+            python3 -m pipx install poetry
+            python3 -m pipx ensurepath
+      - run:
+          name: Install project dependencies
+          command: |
+            poetry install
       - run:
           name: Run tests with coverage
           command: |

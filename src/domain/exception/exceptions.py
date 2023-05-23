@@ -4,3 +4,7 @@ class MissingConfigurationArgsError(Exception):
 
 class ConfigurationFileNotFoundError(Exception):
     pass
+
+
+class UserNotFoundError(Exception):
+    pass

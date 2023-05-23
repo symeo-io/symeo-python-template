@@ -26,6 +26,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+properties/local.ini
+secrets/local.ini
 
 # Pycharm
 .idea
