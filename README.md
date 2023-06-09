@@ -200,6 +200,13 @@ Users : String id
 Users : String(50) username
 ```
 
+## gunicorn config
+
+You can find a `gunicorn` directory at the root of the project where you will find a [gunicorn.conf.py](gunicorn/gunicorn.conf.py) file.
+
+This file is provided to the start command line in the [Dockerfile](Dockerfile). It uses the [multiprocessing](https://docs.python.org/3/library/multiprocessing.html) python library
+to calculate the number of worker that we can start on the server in order to prevent it from killing the process.
+
 ## :rocket: Infrastructure
 
 ### Entrypoint
