@@ -7,6 +7,10 @@ from src.bootstrap.main import bootstrap
 from testcontainers.postgres import PostgresContainer
 from fastapi.testclient import TestClient
 
+from src.infrastructure.postgres_adapter.adapter.postgres_user_adapter import (
+    PostgresUserAdapter,
+)
+
 
 class AbstractIntegrationTestClass(ABC):
     PROPERTIES_PATH: Path = (
@@ -28,7 +32,7 @@ class AbstractIntegrationTestClass(ABC):
             "postgres:13",
             user="postgres-test",
             password="password-test",
-            dbname="symeo-python-template-test",
+            dbname="symeo-test",
         )
         cls.postgres_container.start()
         time.sleep(5)
@@ -40,6 +44,9 @@ class AbstractIntegrationTestClass(ABC):
         ]
         cls.app_client = TestClient(
             bootstrap(cls.input_args, cls.postgres_container.get_connection_url())
+        )
+        cls.postgres_user_adapter = PostgresUserAdapter(
+            cls.postgres_container.get_connection_url()
         )
 
     @classmethod

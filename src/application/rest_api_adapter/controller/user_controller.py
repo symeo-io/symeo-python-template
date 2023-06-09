@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from src.application.rest_api_adapter.dto.user.get_user_dto import GetUserDTO
 from src.application.rest_api_adapter.dto.user.post_user_dto import PostUserDTO
 from src.application.rest_api_adapter.mapper.user.user_mapper import UserMapper
-from src.domain.port.port_in.user_facade import UserFacade
+from src.domain.port.input.user_facade import UserFacade
 
 
 class UserController:
