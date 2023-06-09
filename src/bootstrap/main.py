@@ -6,7 +6,7 @@ import uvicorn
 from alembic.config import Config
 from fastapi import APIRouter
 from fastapi import FastAPI
-
+import alembic.command
 from src.application.rest_api_adapter.controller.user_controller import UserController
 from src.domain.configuration.configuration_service import ConfigurationService
 from src.domain.service.user_service import UserService
@@ -37,7 +37,7 @@ def bootstrap(
         os.path.dirname(os.path.abspath(__file__))
         + "/../infrastructure/postgres_adapter/alembic",
     )
-    # alembic.command.upgrade(alembic_config, 'head') # Run migrations at runtime
+    alembic.command.upgrade(alembic_config, "head")  # Run migrations at runtime
 
     postgres_user_adapter: PostgresUserAdapter = PostgresUserAdapter(database_url)
     user_service: UserService = UserService(postgres_user_adapter)
