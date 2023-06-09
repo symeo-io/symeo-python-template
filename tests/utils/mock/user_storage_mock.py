@@ -1,7 +1,7 @@
 from typing import Optional
 
 from src.domain.model.user_model import User
-from src.domain.port.port_out.user_storage_port import UserStoragePort
+from src.domain.port.output.user_storage_port import UserStoragePort
 
 from faker import Faker
 

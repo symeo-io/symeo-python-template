@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.domain.model.user_model import User
-from src.domain.port.port_out.user_storage_port import UserStoragePort
+from src.domain.port.output.user_storage_port import UserStoragePort
 from src.infrastructure.postgres_adapter.entity.user_entity import UserEntity
 from src.infrastructure.postgres_adapter.mapper.user_mapper import UserMapper
 

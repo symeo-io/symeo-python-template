@@ -10,7 +10,6 @@
 ### Install the application locally
 
 - Run `git clone git@github.com:your-organisation/symeo-python-template.git` or `git clone https://github.com/your-organisation/symeo-python-template.git` to clone the repository
-- Run `cd symeo-python-template` to navigate to the code folder
 - Run `pre-commit install` to set up the git hook scripts
 - Run `poetry install` to install node dependencies
 - Run `docker-compose up` to start the local PostGreSQL Database
@@ -41,83 +40,62 @@ The source code is contained in the `/src` directory:
 
 ```text
 src
-├── __init__.py
-│   └── __init__.cpython-310.pyc
 ├── application
-│   ├── __init__.py
 │   └── rest_api_adapter
-│       ├── __init__.py
 │       ├── controller
-│       │   ├── __init__.py
 │       │   └── user_controller.py
 │       ├── dto
-│       │   ├── __init__.py
 │       │   └── user
-│       │       ├── __init__.py
 │       │       ├── get_user_dto.py
 │       │       ├── post_user_dto.py
 │       │       └── user_dto.py
 │       └── mapper
-│           ├── __init__.py
 │           └── user
-│               ├── __init__.py
 │               └── user_mapper.py
 ├── bootstrap
-│   ├── __init__.py
 │   └── main.py
 ├── domain
 │   ├── __init__.py
 │   ├── configuration
-│   │   ├── __init__.py
 │   │   └── configuration_service.py
 │   ├── exception
-│   │   ├── __init__.py
 │   │   └── exceptions.py
 │   ├── model
-│   │   ├── __init__.py
 │   │   └── user_model.py
 │   ├── port
-│   │   ├── port_in
-│   │   │   ├── __init__.py
+│   │   ├── input
 │   │   │   └── user_facade.py
-│   │   └── port_out
-│   │       ├── __init__.py
+│   │   └── output
 │   │       └── user_storage_port.py
 │   └── service
-│       ├── __init__.py
 │       └── user_service.py
 └── infrastructure
-    ├── __init__.py
     └── postgres_adapter
-        ├── __init__.py
         ├── adapter
-        │   ├── __init__.py
         │   └── postgres_user_adapter.py
         ├── alembic
         │   ├── README
-        │   ├── __init__.py
         │   ├── env.py
         │   ├── script.py.mako
         │   └── versions
         │       ├── 4807754e549a_init_user_table.py
         ├── entity
-        │   ├── __init__.py
         │   └── user_entity.py
         ├── mapper
-        │   ├── __init__.py
         │   └── user_mapper.py
         └── utils
-            ├── __init__.py
             └── postgres_utils.py
 ```
 
 The structure of this project follows **Hexagonal-Architecture** and **Domain-Driven-Design** principles and is seperated into 4 main folders:
 1. `/application`: it will contain all the adapters related to your "application". For now, you will only find one application adapter (`rest-api-adatper`) containing
 the route endpoints (`/application/rest-api-adapter/controller`) as well as the DTOs of those endpoints (`/application/rest-api-adapter/dto`).
-2. `/domain`: this is where all the business logic has to be. You will find the `models`, the different ports `/domain/port/in` and `/domain/port/out` on which you will plug your adapters and finally your `services`.
+2. `/domain`: this is where all the business logic has to be. You will find the `models`, the different ports `/domain/port/input` and `/domain/port/output` on which you will plug your adapters and finally your `services`.
 See the [configuration](#configuration) section to understand the role of the `configuration` folder.
 3. `/infrastructure`: this is where all your adapters related to your infrastructure should be. For now, you will only find one adapter which is a `postgres-adapter`.
 4. `/bootstrap`: this is where you will bootstrap your project by making [dependency injections](#dependency-injection).
+
+More about hexagonal architecture : [blog post](https://blog.octo.com/architecture-hexagonale-trois-principes-et-un-exemple-dimplementation/)
 
 ### Framework
 
@@ -154,11 +132,20 @@ For now, only one migration exists and is named [4807754e549a_init_user_table.py
 All the alembic migrations are run at runtime. If you look into the [main.py](src/bootstrap/main.py) file (the entrypoint of the app), you will find those lines of code:
 
 ```python
-alembic_config = Config("alembic.ini")
+alembic_config_path = (
+    os.path.dirname(os.path.abspath(__file__)) + "/../../alembic.ini"
+)
+alembic_config = Config(alembic_config_path)
 database_url = get_postgres_url(configuration_service, test_container_url)
 escaped_database_url = database_url.replace("%", "%%")
 alembic_config.set_section_option("alembic", "sqlalchemy.url", escaped_database_url)
-alembic.command.upgrade(alembic_config, "head")
+alembic_config.set_section_option(
+    "alembic",
+    "script_location",
+    os.path.dirname(os.path.abspath(__file__))
+    + "/../infrastructure/postgres_adapter/alembic",
+)
+# alembic.command.upgrade(alembic_config, 'head') # Run migrations at runtime
 ```
 
 - We first indicate to alembic where to find the config file `alembic.ini` (e.g. at the root of our project).
@@ -226,20 +213,33 @@ def bootstrap(
     configuration_service = ConfigurationService()
     configuration_service.init_from_args(input_args)
 
-    alembic_config = Config("alembic.ini")
+    alembic_config_path = (
+        os.path.dirname(os.path.abspath(__file__)) + "/../../alembic.ini"
+    )
+    alembic_config = Config(alembic_config_path)
     database_url = get_postgres_url(configuration_service, test_container_url)
     escaped_database_url = database_url.replace("%", "%%")
     alembic_config.set_section_option("alembic", "sqlalchemy.url", escaped_database_url)
-    alembic.command.upgrade(alembic_config, "head")
+    alembic_config.set_section_option(
+        "alembic",
+        "script_location",
+        os.path.dirname(os.path.abspath(__file__))
+        + "/../infrastructure/postgres_adapter/alembic",
+    )
+    # alembic.command.upgrade(alembic_config, 'head') # Run migrations at runtime
+
+    postgres_user_adapter: PostgresUserAdapter = PostgresUserAdapter(database_url)
+    user_service: UserService = UserService(postgres_user_adapter)
 
     app = FastAPI(title="Your API")
     api_router = APIRouter()
     api_router.include_router(
-        UserController(UserService(PostgresUserAdapter(database_url))).build(),
+        UserController(user_service).build(),
         prefix="/users",
         tags=["users"],
     )
     app.include_router(api_router, prefix="/api/v1")
+    app.include_router(add_health_check(), tags=["tech"])
     return app
 ```
 
@@ -254,10 +254,13 @@ We can see three main parts in this method:
 We achieve our dependency injection as follows:
 
 ```python
+postgres_user_adapter: PostgresUserAdapter = PostgresUserAdapter(database_url)
+user_service: UserService = UserService(postgres_user_adapter)
+
 app = FastAPI(title="Your API")
 api_router = APIRouter()
 api_router.include_router(
-    UserController(UserService(PostgresUserAdapter(database_url))).build(),
+    UserController(user_service).build(),
     prefix="/users",
     tags=["users"],
 )
